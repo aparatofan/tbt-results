@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TBT Results — prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Roboto+Slab:wght@400;600;700&family=Roboto+Mono:wght@700&display=swap">
+<style>
+/* Tokens copied from the Test Maker prototypes (shipped sibling code wins if they differ). */
+:root{
+  --tbt-blue:#0856C9; --tbt-blue-dark:#063F94;
+  --tbt-canvas:#F6F8FC; --tbt-surface:#FFFFFF; --tbt-input:#F0F5FE; --tbt-selected-bg:#EDF4FF;
+  --tbt-border:#D8E3F0; --tbt-ink:#1F2937; --tbt-muted:#667085; --tbt-faint:#8299B8;
+  --tbt-success:#16803C; --tbt-success-bg:#ECFDF3; --tbt-error:#C62828; --tbt-error-bg:#FFF1F1;
+  --tbt-white:#FFFFFF; --tbt-hero-soft:rgba(255,255,255,.82);
+  --tbt-shadow:0 6px 20px rgba(24,56,96,.07);
+  --tbt-focus-ring:0 0 0 3px rgba(8,86,201,.18);
+  --ui:"Roboto",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --content:"Roboto Slab",Georgia,serif;
+  --identity:"Roboto Mono",ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;min-width:768px;background:var(--tbt-canvas);color:var(--tbt-ink);font:400 16px/1.5 var(--ui);padding:16px 16px 64px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+button,select,input{font:inherit}
+button{cursor:pointer}
+button:focus-visible,a:focus-visible,select:focus-visible{outline:none;box-shadow:var(--tbt-focus-ring)}
+h1,h2,h3,p{margin:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+
+.proto{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;font-size:14px;color:var(--tbt-muted);border:1px dashed var(--tbt-border);border-radius:12px;padding:8px 16px;background:var(--tbt-surface)}
+.proto b{color:var(--tbt-ink);font-weight:600}
+
+
+.abar{display:flex;align-items:center;gap:10px}
+.abar .title{min-width:234px;font:700 28px/1.2 var(--content);color:var(--tbt-blue);letter-spacing:-.01em}
+.abar .line{flex:1;height:1px;background:var(--tbt-border)}
+.search{position:relative;width:340px;flex:none;max-width:100%}
+.search input{width:100%;height:44px;border:1px solid transparent;border-radius:12px;background:var(--tbt-input);padding:0 40px;color:var(--tbt-ink)}
+.search input:focus{background:var(--tbt-surface);border-color:var(--tbt-blue);outline:none;box-shadow:var(--tbt-focus-ring)}
+.search svg{position:absolute;left:14px;top:13px;color:var(--tbt-muted)}
+.search .x{position:absolute;right:6px;top:6px;width:32px;height:32px;border:0;background:none;color:var(--tbt-muted);font-size:18px;border-radius:8px}
+
+.seg{display:inline-flex;border:1px solid var(--tbt-border);border-radius:12px;overflow:hidden;background:var(--tbt-surface)}
+.seg button{border:0;background:none;padding:8px 14px;color:var(--tbt-muted);font-weight:500}
+.seg button[aria-pressed=true]{background:var(--tbt-selected-bg);color:var(--tbt-blue-dark);font-weight:600}
+
+.filters{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.filters select{height:44px;border:1px solid transparent;border-radius:12px;background:var(--tbt-input);padding:0 36px 0 14px;color:var(--tbt-ink);appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23667085' stroke-width='1.6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.spacer{flex:1}
+.summary{font-size:14px;color:var(--tbt-muted)}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px}
+.stat{background:var(--tbt-surface);border:1px solid var(--tbt-border);border-radius:16px;padding:16px 24px}
+.stat .v{font:700 28px/1.2 var(--content);font-variant-numeric:tabular-nums}
+.stat .k{font-size:14px;color:var(--tbt-muted)}
+
+.stage{background:var(--tbt-surface);border:1px solid var(--tbt-border);border-radius:22px;box-shadow:var(--tbt-shadow);padding:32px 40px;display:flex;flex-direction:column;gap:20px}
+.stage h2{font:700 22px/1.25 var(--content)}
+.stage .sub{color:var(--tbt-muted);margin-top:-12px;font-size:15px}
+
+.rhead{display:flex;flex-direction:column;gap:6px}
+.rhead h2{font:700 28px/1.25 var(--content);color:var(--tbt-blue);letter-spacing:-.01em}
+.back{align-self:flex-start;height:40px;padding:0 16px;border-radius:12px;border:1px solid var(--tbt-border);background:var(--tbt-surface);color:var(--tbt-blue-dark);font-weight:600}
+.back:hover{background:var(--tbt-selected-bg)}
+
+table.rt{width:100%;border-collapse:collapse}
+.rt th{text-align:left;font-size:13px;font-weight:600;color:var(--tbt-muted);text-transform:uppercase;letter-spacing:.06em;padding:0 12px 10px;border-bottom:1px solid var(--tbt-border)}
+.rt td{padding:12px;border-bottom:1px solid var(--tbt-border);vertical-align:middle}
+.rt tr:last-child td{border-bottom:0}
+.rt tbody tr:hover td{background:var(--tbt-canvas)}
+.rt .when{white-space:nowrap;color:var(--tbt-muted);font-size:14px}
+.rt .act{font-family:var(--content)}
+.lnk{border:0;background:none;padding:0;color:inherit;font:inherit;text-align:left;border-radius:4px}
+.lnk:hover{color:var(--tbt-blue);text-decoration:underline}
+.rt .who .lnk{font-weight:600}
+.open{color:var(--tbt-blue);font-size:14px;font-weight:600;text-decoration:none;white-space:nowrap}
+.open:hover{text-decoration:underline}
+
+.tool{display:inline-block;font:500 12px/1 var(--ui);padding:5px 9px;border-radius:999px;background:var(--tbt-input);color:var(--tbt-blue-dark);white-space:nowrap}
+.res{display:flex;align-items:center;gap:10px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.meter{display:inline-block;width:72px;height:6px;border-radius:999px;background:var(--tbt-input);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--tbt-blue);border-radius:999px}
+.pill{display:inline-block;font:600 13px/1 var(--ui);padding:6px 10px;border-radius:999px}
+.pill.done{background:var(--tbt-success-bg);color:var(--tbt-success)}
+.pill.wait{background:var(--tbt-input);color:var(--tbt-muted);font-weight:500}
+
+.bytool{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.bt{border:1px solid var(--tbt-border);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:2px}
+.bt b{font-weight:600}
+.bt span{font-size:14px;color:var(--tbt-muted)}
+
+.notyet{display:flex;flex-wrap:wrap;gap:8px}
+.notyet span{padding:6px 12px;border-radius:999px;border:1px dashed var(--tbt-border);font-size:14px;color:var(--tbt-muted)}
+.empty{color:var(--tbt-muted);padding:16px 0}
+
+</style>
+
+<div class="wrap">
+  <div class="proto">
+    <b>Prototype</b> · View as
+    <div class="seg" role="group" aria-label="View as">
+      <button type="button" data-mode="teacher" aria-pressed="true">Teacher</button>
+      <button type="button" data-mode="student" aria-pressed="false">Student (Kat)</button>
+    </div>
+    <span>Sample data. Click a student or an activity name. No page header: the Divi page supplies its own. Tablet and desktop only.</span>
+  </div>
+  <main id="app"></main>
+</div>
+
+<script>
+const TOOLS = {test:"Test", homework:"Homework", swipe:"Swipe", mg:"Matching Game", dd:"Drag & Drop", drill:"Translation Drill", fill:"Fill"};
+const CLASSES = {e4p1:"E4P1", psy:"Psychologists B2", mat:"Matura 2027"};
+const STUDENTS = [
+  {id:1,name:"Alita Nowak",cls:"e4p1"},{id:2,name:"Pete Wiśniewski",cls:"e4p1"},{id:3,name:"Sven Kowalczyk",cls:"e4p1"},
+  {id:4,name:"Kat Zielińska",cls:"mat"},{id:5,name:"Kasia Lewandowska",cls:"psy"},{id:6,name:"Tomek Dąbrowski",cls:"psy"},{id:7,name:"Ola Mazur",cls:"mat"}];
+const ACTS = [
+  {id:"t1",tool:"test",title:"Past Simple or Present Perfect?",cls:"e4p1",max:20},
+  {id:"t2",tool:"test",title:"Matura grammar diagnostic",cls:"mat",max:100},
+  {id:"h1",tool:"homework",title:"An email to a hotel",cls:"mat",max:10},
+  {id:"h2",tool:"homework",title:"My ideal weekend",cls:"e4p1",max:10},
+  {id:"s1",tool:"swipe",title:"Phones and technology",cls:"e4p1",max:12},
+  {id:"s2",tool:"swipe",title:"Feelings and emotions",cls:"psy",max:15},
+  {id:"m1",tool:"mg",title:"Phrasal verbs with GET",cls:"mat",max:10},
+  {id:"d1",tool:"dd",title:"Articles: a, an, the",cls:"e4p1",max:10},
+  {id:"r1",tool:"drill",title:"Therapy session phrases",cls:"psy",max:null},
+  {id:"r2",tool:"drill",title:"Describing symptoms",cls:"psy",max:null},
+  {id:"f1",tool:"fill",title:"Travel phrases",cls:"mat",max:8}];
+
+// deterministic sample rows
+let seed = 7; const rnd = () => (seed = (seed*9301+49297)%233280)/233280;
+const NOW = new Date("2026-11-13T23:40:00");
+const ROWS = []; let rid = 1;
+ACTS.forEach(a => STUDENTS.filter(s=>s.cls===a.cls).forEach(s => {
+  if (rnd() < .22) return;                       // some students have not done it yet
+  const times = a.tool==="swipe" ? 1+Math.floor(rnd()*2) : 1;
+  for (let i=0;i<times;i++){
+    const when = new Date(NOW - Math.floor(rnd()*20*24*60)*60000);
+    let score = a.max==null ? null : Math.max(1,Math.round(a.max*(.45+rnd()*.55)));
+    const waiting = a.tool==="homework" && rnd()<.35;
+    ROWS.push({id:rid++, sid:s.id, aid:a.id, when, score: waiting?null:score, waiting});
+  }
+}));
+ROWS.sort((x,y)=>y.when-x.when);
+
+const st = {mode:"teacher", view:"all", key:null, q:"", tool:"", cls:"", range:"30"};
+const ME = 4;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fold = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/ł/g,"l");
+const stu = id => STUDENTS.find(s=>s.id===id), act = id => ACTS.find(a=>a.id===id);
+const pct = r => r.score==null ? null : Math.round(r.score/act(r.aid).max*100);
+function fmtWhen(d){
+  const day = Math.floor((new Date(NOW.toDateString()) - new Date(d.toDateString()))/864e5);
+  const t = d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+  return day===0 ? `Today ${t}` : day===1 ? `Yesterday ${t}` : d.toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+}
+function inRange(r){ return !st.range || (NOW - r.when) <= +st.range*864e5; }
+function resultCell(r){
+  const a = act(r.aid);
+  if (a.max==null) return `<span class="pill done">✓ Done</span>`;
+  if (r.waiting)   return `<span class="pill wait">Waiting for marking</span>`;
+  const p = pct(r);
+  return `<span class="res">${r.score} / ${a.max} · ${p}%<span class="meter" aria-hidden="true"><i style="width:${p}%"></i></span></span>`;
+}
+function avg(rows){ const s = rows.filter(r=>pct(r)!=null); return s.length ? Math.round(s.reduce((t,r)=>t+pct(r),0)/s.length)+"%" : "–"; }
+const days = rows => new Set(rows.map(r=>r.when.toDateString())).size;
+const openLink = r => ["test","homework"].includes(act(r.aid).tool) && !r.waiting ? `<a class="open" href="#" onclick="return false">Open ↗</a>` : "";
+
+function filters(withClass){
+  return `<div class="filters">
+    <select id="ftool" aria-label="Tool"><option value="">All tools</option>${Object.entries(TOOLS).map(([k,v])=>`<option value="${k}" ${st.tool===k?"selected":""}>${v}</option>`).join("")}</select>
+    ${withClass?`<select id="fcls" aria-label="Class"><option value="">All classes</option>${Object.entries(CLASSES).map(([k,v])=>`<option value="${k}" ${st.cls===k?"selected":""}>${v}</option>`).join("")}</select>`:""}
+    <select id="frange" aria-label="Period">${[["7","Last 7 days"],["30","Last 30 days"],["","All time"]].map(([k,v])=>`<option value="${k}" ${st.range===k?"selected":""}>${v}</option>`).join("")}</select>
+  </div>`;
+}
+function searchBox(ph){
+  return `<div class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <label class="sr" for="q">${ph}</label><input id="q" type="text" placeholder="${ph}" value="${esc(st.q)}" autocomplete="off">
+    ${st.q?`<button class="x" type="button" data-act="clear" aria-label="Clear">×</button>`:""}</div>`;
+}
+
+/* ---------- teacher: everything ---------- */
+function teacherAll(){
+  const q = fold(st.q.trim());
+  const rows = ROWS.filter(r => inRange(r) && (!st.tool || act(r.aid).tool===st.tool) && (!st.cls || act(r.aid).cls===st.cls)
+    && (!q || fold(stu(r.sid).name).includes(q) || fold(act(r.aid).title).includes(q)));
+  const week = ROWS.filter(r => NOW-r.when <= 7*864e5);
+  const waiting = ROWS.filter(r=>r.waiting).length;
+  return `
+  <div class="abar"><h2 class="title">Results</h2><span class="line"></span>${searchBox("Search a student or an activity…")}</div>
+  <div class="stats" style="margin-top:24px">
+    <div class="stat"><div class="v">${week.length}</div><div class="k">activities finished this week</div></div>
+    <div class="stat"><div class="v">${new Set(week.map(r=>r.sid)).size} of ${STUDENTS.length}</div><div class="k">students active this week</div></div>
+    <div class="stat"><div class="v">${avg(week)}</div><div class="k">average score this week</div></div>
+    <div class="stat"><div class="v">${waiting}</div><div class="k">homework waiting for marking</div></div>
+  </div>
+  <section class="stage" style="margin-top:24px">
+    <div class="filters">${filters(true)}<span class="spacer"></span><span class="summary">${rows.length} result${rows.length===1?"":"s"}</span></div>
+    ${rows.length ? `<table class="rt"><thead><tr><th>Student</th><th>Activity</th><th>Class</th><th>When</th><th>Result</th><th><span class="sr">Open</span></th></tr></thead><tbody>
+      ${rows.slice(0,60).map(r=>{ const a=act(r.aid), s=stu(r.sid); return `<tr>
+        <td class="who"><button class="lnk" data-stu="${s.id}">${esc(s.name)}</button></td>
+        <td class="act"><button class="lnk" data-act-id="${a.id}">${esc(a.title)}</button> <span class="tool">${TOOLS[a.tool]}</span></td>
+        <td class="summary">${CLASSES[a.cls]}</td>
+        <td class="when">${fmtWhen(r.when)}</td>
+        <td>${resultCell(r)}</td><td>${openLink(r)}</td></tr>`; }).join("")}
+    </tbody></table>` : `<p class="empty">Nothing matches. Try another name, tool or period.</p>`}
+  </section>`;
+}
+
+/* ---------- teacher: one student ---------- */
+function teacherStudent(){
+  const s = stu(st.key), all = ROWS.filter(r=>r.sid===s.id);
+  const rows = all.filter(r => inRange(r) && (!st.tool || act(r.aid).tool===st.tool));
+  const by = Object.keys(TOOLS).map(k=>({k, rs: all.filter(r=>act(r.aid).tool===k)})).filter(x=>x.rs.length);
+  const last = all[0];
+  return `
+  <button class="back" data-act="home">← All results</button>
+  <div class="rhead" style="margin-top:16px"><h2>${esc(s.name)}</h2><p class="summary">${CLASSES[s.cls]} · last active ${last?fmtWhen(last.when):"never"}</p></div>
+  <div class="stats" style="margin-top:24px">
+    <div class="stat"><div class="v">${all.length}</div><div class="k">activities finished</div></div>
+    <div class="stat"><div class="v">${avg(all)}</div><div class="k">average score</div></div>
+    <div class="stat"><div class="v">${days(all.filter(r=>NOW-r.when<=30*864e5))}</div><div class="k">active days in the last 30</div></div>
+  </div>
+  <section class="stage" style="margin-top:24px">
+    <h2>By tool</h2>
+    <div class="bytool">${by.map(x=>`<div class="bt"><b>${TOOLS[x.k]}</b><span>${x.rs.length} done${act(x.rs[0].aid).max!=null?` · average ${avg(x.rs)}`:""}</span></div>`).join("")}</div>
+  </section>
+  <section class="stage" style="margin-top:24px">
+    <div class="filters"><h2 style="margin-right:12px">Activities</h2>${filters(false)}<span class="spacer"></span><span class="summary">${rows.length} shown</span></div>
+    ${rows.length ? `<table class="rt"><thead><tr><th>Activity</th><th>When</th><th>Result</th><th><span class="sr">Open</span></th></tr></thead><tbody>
+      ${rows.map(r=>{ const a=act(r.aid); return `<tr><td class="act"><button class="lnk" data-act-id="${a.id}">${esc(a.title)}</button> <span class="tool">${TOOLS[a.tool]}</span></td>
+        <td class="when">${fmtWhen(r.when)}</td><td>${resultCell(r)}</td><td>${openLink(r)}</td></tr>`; }).join("")}
+    </tbody></table>` : `<p class="empty">Nothing in this period.</p>`}
+  </section>`;
+}
+
+/* ---------- teacher: one activity ---------- */
+function teacherActivity(){
+  const a = act(st.key), rows = ROWS.filter(r=>r.aid===a.id);
+  const done = new Set(rows.map(r=>r.sid));
+  const missing = STUDENTS.filter(s=>s.cls===a.cls && !done.has(s.id));
+  const scored = rows.filter(r=>pct(r)!=null);
+  const best = scored.length ? Math.max(...scored.map(pct))+"%" : "–";
+  return `
+  <button class="back" data-act="home">← All results</button>
+  <div class="rhead" style="margin-top:16px"><h2>${esc(a.title)}</h2><p class="summary">${TOOLS[a.tool]} · ${CLASSES[a.cls]}${a.max!=null?` · out of ${a.max}`:" · no score, done or not done"}</p></div>
+  <div class="stats" style="margin-top:24px">
+    <div class="stat"><div class="v">${done.size} of ${done.size+missing.length}</div><div class="k">students in the class have done it</div></div>
+    ${a.max!=null?`<div class="stat"><div class="v">${avg(rows)}</div><div class="k">average score</div></div>
+    <div class="stat"><div class="v">${best}</div><div class="k">best score</div></div>`:""}
+  </div>
+  ${missing.length?`<section class="stage" style="margin-top:24px"><h2>Not done yet</h2>
+    <div class="notyet">${missing.map(s=>`<span>${esc(s.name)}</span>`).join("")}</div></section>`:""}
+  <section class="stage" style="margin-top:24px"><h2>Who did it</h2>
+    <table class="rt"><thead><tr><th>Student</th><th>When</th><th>Result</th><th><span class="sr">Open</span></th></tr></thead><tbody>
+      ${rows.map(r=>{ const s=stu(r.sid); return `<tr><td class="who"><button class="lnk" data-stu="${s.id}">${esc(s.name)}</button></td>
+        <td class="when">${fmtWhen(r.when)}</td><td>${resultCell(r)}</td><td>${openLink(r)}</td></tr>`; }).join("")}
+    </tbody></table>
+  </section>`;
+}
+
+/* ---------- student: my results ---------- */
+function studentMine(){
+  const q = fold(st.q.trim());
+  const all = ROWS.filter(r=>r.sid===ME);
+  const rows = all.filter(r => inRange(r) && (!st.tool || act(r.aid).tool===st.tool) && (!q || fold(act(r.aid).title).includes(q)));
+  const month = all.filter(r=>NOW-r.when<=30*864e5);
+  return `
+  <div class="abar"><h2 class="title">My results</h2><span class="line"></span>${searchBox("Search your activities…")}</div>
+  <div class="stats" style="margin-top:24px">
+    <div class="stat"><div class="v">${month.length}</div><div class="k">activities finished in the last 30 days</div></div>
+    <div class="stat"><div class="v">${avg(month)}</div><div class="k">your average score</div></div>
+    <div class="stat"><div class="v">${days(month)}</div><div class="k">days you practised</div></div>
+  </div>
+  <section class="stage" style="margin-top:24px">
+    <div class="filters">${filters(false)}<span class="spacer"></span><span class="summary">${rows.length} shown</span></div>
+    ${rows.length ? `<table class="rt"><thead><tr><th>Activity</th><th>When</th><th>Result</th><th><span class="sr">Open</span></th></tr></thead><tbody>
+      ${rows.map(r=>{ const a=act(r.aid); return `<tr><td class="act">${esc(a.title)} <span class="tool">${TOOLS[a.tool]}</span></td>
+        <td class="when">${fmtWhen(r.when)}</td><td>${resultCell(r)}</td><td>${openLink(r)}</td></tr>`; }).join("")}
+    </tbody></table>` : `<p class="empty">Nothing here yet. Finish a test, a deck or a drill and it appears here.</p>`}
+  </section>`;
+}
+
+function render(){
+  const teacher = st.mode==="teacher";
+  const html = !teacher ? studentMine() : st.view==="student" ? teacherStudent() : st.view==="activity" ? teacherActivity() : teacherAll();
+  const had = document.activeElement && document.activeElement.id==="q", pos = had ? document.activeElement.selectionStart : 0;
+  $("#app").innerHTML = html;
+  if (had && $("#q")) { $("#q").focus(); $("#q").setSelectionRange(pos,pos); }
+}
+document.addEventListener("click", e=>{
+  const m = e.target.closest("[data-mode]");
+  if (m){ st.mode=m.dataset.mode; Object.assign(st,{view:"all",key:null,q:"",tool:""}); document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed", b===m)); render(); return; }
+  const s = e.target.closest("[data-stu]"); if (s){ Object.assign(st,{view:"student",key:+s.dataset.stu,tool:""}); render(); scrollTo(0,0); return; }
+  const a = e.target.closest("[data-act-id]"); if (a){ Object.assign(st,{view:"activity",key:a.dataset.actId}); render(); scrollTo(0,0); return; }
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  if (b.dataset.act==="home"){ Object.assign(st,{view:"all",key:null,tool:""}); render(); }
+  if (b.dataset.act==="clear"){ st.q=""; render(); }
+});
+document.addEventListener("input", e=>{ if (e.target.id==="q"){ st.q=e.target.value; render(); } });
+document.addEventListener("change", e=>{
+  if (e.target.id==="ftool") st.tool=e.target.value;
+  if (e.target.id==="fcls") st.cls=e.target.value;
+  if (e.target.id==="frange") st.range=e.target.value;
+  render();
+});
+render();
+</script>
