@@ -15,13 +15,23 @@ TBT Results stores nothing. It reads the activity log kept by **TBT Notes 1.22.0
 - `class_id` 0 means the student was in no class when they finished. Only administrators see those rows.
 - An activity is identified by `tool` + `object_ref`. Its name is `object_title` from the newest row.
 
-Tools reporting today, and their slugs: `swipe`, `matching`, `dragdrop`, `drill`. Coming in later releases of their own plugins: `test` (Test Maker 0.7.0), `fill` (Fill 1.8.0), `homework` (Homework 0.5.0). Results must show any slug, known or not.
+Tools reporting today, and their slugs (checked against live rows, 14 Nov 2026):
+
+| Slug | Tool | Score |
+|---|---|---|
+| `swipe` | Swipe | none, by design: finishing a deck means every card was known, so it shows "✓ Done" |
+| `matching` | Matching Game | yes |
+| `dragdrop` | Drag & Drop | yes |
+| `drill` | Translation Drill | none: "✓ Done" |
+| `test` | Test Maker | yes (`score` / `score_max` from the server's result) |
+
+Coming in later releases of their own plugins: `fill` (Fill 1.8.0), `homework` (Homework 0.5.0). Results must show any slug, known or not.
 
 ## Scope
 
 | 0.1.0 | Later |
 |---|---|
-| New plugin: bootstrap, deploy workflow, `CLAUDE.md` already in the repo | "Open ↗" links to a test result or a marked homework (with Test Maker 0.7.0 / Homework 0.5.0) |
+| New plugin: bootstrap, deploy workflow, `CLAUDE.md` already in the repo | "Open ↗" links to a test result or a marked homework (needs the attempt reference in the row; later releases) |
 | Teacher page `[tbt_results]`: all results, one student, one activity | "Homework waiting for marking" tile and "Waiting for marking" pill (Homework 0.5.0) |
 | Student page `[tbt_my_results]` | CSV export |
 | REST routes, owner/visibility rules | TBT Points |
@@ -54,7 +64,7 @@ The repo has no plugin code yet. Read the sibling code instead:
 
 1. **Notes.** In `aparatofan/tbt_notes` (main, 1.22.0): confirm the activity table's columns and indexes as listed above; confirm these exist and report their return shapes: `TBT_Notes_DB::table_activity()`, `get_class()`, `get_all_classes()`, `get_classes_for_teacher()`, `get_student_ids_for_class()`, `get_students_for_class()`, `TBT_Notes_Capabilities::user_can_manage()`, `::user_can_manage_all()`, constant `TBT_NOTES_CAP`.
 2. **Test Maker as the pattern.** In `aparatofan/tbt-test-maker`: how it registers and enqueues tokens and fonts (`class-tbttm-assets.php`), how the teacher page boots its JS (localized data, nonce, REST base), how it checks for Notes (`TBTTM_Classes::available()`), the Hub item, and the deploy workflow. Results copies these patterns; report anything that does not transfer.
-3. **Tool slugs.** Confirm the slugs the four reporting tools send: Swipe `swipe`, Matching Game `matching`, Drag & Drop `dragdrop`, Translation Drill `drill`.
+3. **Tool slugs.** Confirm the slugs the five reporting tools send: Swipe `swipe`, Matching Game `matching`, Drag & Drop `dragdrop`, Translation Drill `drill`, Test Maker `test`.
 4. **Volume.** If you can, say how the queries below use the existing indexes (`user_created`, `class_created`, `teacher_created`). No new index is planned; say so if one is clearly needed.
 
 **Hard stop** if anything here contradicts the spec. Otherwise end with the report and wait for Mariusz to say go.
@@ -175,11 +185,11 @@ State what still needs a live check.
 
 Mariusz creates two Divi pages: **Results** under Teacher Tools with `[tbt_results]`, and **My results** in the Learning Tools menu with `[tbt_my_results]`.
 
-- [ ] As admin: Results lists recent decks, games and drills from every class, plus the class-less student's rows marked "No class".
+- [ ] As admin: Results lists recent tests, decks, games and drills from every class, plus the class-less student's rows marked "No class".
 - [ ] Searching a student's name and an activity title both narrow the list; tool, class and period filters work together.
 - [ ] Clicking a student opens their page; "By tool" matches their rows; Back returns to the list with the filters kept.
 - [ ] Clicking an activity shows who did it, the average and best, and a "Not done yet" list that matches the class.
-- [ ] A drill shows "✓ Done", never a score.
+- [ ] A drill and a Swipe deck show "✓ Done", never a score; a test shows its score.
 - [ ] A deck played three times shows three rows.
 - [ ] As Madzia (teacher, not admin): only her classes' rows; no "No class" option; opening a student from another teacher's class by URL shows "This student is not in your classes."
 - [ ] As a student: My results shows only their own rows, no names or classes; search and filters work.
