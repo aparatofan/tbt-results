@@ -20,7 +20,7 @@ Tools reporting today, and their slugs (checked against live rows, 14 Nov 2026):
 | Slug | Tool | Score |
 |---|---|---|
 | `swipe` | Swipe | none, by design: finishing a deck means every card was known, so it shows "✓ Done" |
-| `matching` | Matching Game | yes |
+| `matching` | Matching Game | none, on purpose (attempts are not a score): "✓ Done" |
 | `dragdrop` | Drag & Drop | yes |
 | `drill` | Translation Drill | none: "✓ Done" |
 | `test` | Test Maker | yes (`score` / `score_max` from the server's result) |
@@ -189,7 +189,7 @@ Mariusz creates two Divi pages: **Results** under Teacher Tools with `[tbt_resul
 - [ ] Searching a student's name and an activity title both narrow the list; tool, class and period filters work together.
 - [ ] Clicking a student opens their page; "By tool" matches their rows; Back returns to the list with the filters kept.
 - [ ] Clicking an activity shows who did it, the average and best, and a "Not done yet" list that matches the class.
-- [ ] A drill and a Swipe deck show "✓ Done", never a score; a test shows its score.
+- [ ] A drill, a Swipe deck and a Matching Game show "✓ Done", never a score; a test and a Drag & Drop exercise show their score.
 - [ ] A deck played three times shows three rows.
 - [ ] As Madzia (teacher, not admin): only her classes' rows; no "No class" option; opening a student from another teacher's class by URL shows "This student is not in your classes."
 - [ ] As a student: My results shows only their own rows, no names or classes; search and filters work.
